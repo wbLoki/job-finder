@@ -43,3 +43,23 @@ The app remembers one date per source: the publish time of the **newest job any 
 - **Working Nomads**: downloads their public job feed once (read-only) and refreshes it every 30 minutes; filtering happens locally.
 
 Both are unofficial: if either site changes its internals, that source will show an error in the app while the other keeps working.
+
+## Remote job scanner (`scan.py`)
+
+A command-line scan for remote TypeScript / React / Node roles that someone outside the US/EU can apply to. It checks:
+
+- the public job boards (Greenhouse, Lever, Ashby) of about 170 remote-friendly companies;
+- the Remotive, Remote OK, We Work Remotely and Himalayas feeds.
+
+```
+python scan.py          # only matches you haven't been shown before
+python scan.py --all    # every current match
+```
+
+Double-clicking `scan.bat` does the same. Everything it keeps is in `data/` (git-ignored):
+
+- `data/applied.txt`: companies to skip, one per line (matched as part of the company name).
+- `data/scan_seen.json`: URLs of matches already shown.
+- `data/scan_latest.csv`: every match from the last run, to open in a spreadsheet.
+
+To add companies, put their board name into `GREENHOUSE`, `LEVER` or `ASHBY` at the top of the file (the part after `boards.greenhouse.io/`, `jobs.lever.co/` or `jobs.ashbyhq.com/`). The title, stack and location filters are the regexes below those lists.
