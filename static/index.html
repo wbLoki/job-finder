@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Finder</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66; --line: #e4e2dc;
+    --accent: #1f6f5c; --accent-soft: #e3f0ec; --wttj: #ffcd00; --wttj-ink: #3d3200; --wn: #dbe7ff; --wn-ink: #1c3a7a;
+    --star: #d99a00; --danger: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151514; --panel: #1e1e1c; --ink: #ecebe6; --muted: #9c9a93; --line: #2f2f2c;
+      --accent: #5cc3a8; --accent-soft: #1e332d; --wttj: #5a4b00; --wttj-ink: #ffe46b; --wn: #1f2c4a; --wn-ink: #b9cdff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .bar { max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .brand { font-weight: 700; font-size: 16px; margin-right: 6px; white-space: nowrap; }
+  #q { flex: 1 1 280px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 15px; }
+  select, input[type=number] { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); font: inherit; width: 100%; }
+  button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 7px 12px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tabs button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  main { max-width: 1280px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 290px 1fr; gap: 20px; align-items: start; }
+  aside { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px 14px 14px; }
+  fieldset { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 12px 0 4px; }
+  fieldset:first-child { border-top: 0; }
+  legend { font-weight: 600; padding: 0; margin-bottom: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  label.row { display: flex; gap: 7px; align-items: center; margin: 4px 0; cursor: pointer; }
+  .sub { font-size: 12px; color: var(--muted); margin: 8px 0 3px; }
+  .hint { font-size: 12px; color: var(--muted); margin: 4px 0; }
+  .src-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+  .summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; color: var(--muted); }
+  .summary b { color: var(--ink); }
+  .err { background: #fdecea; color: var(--danger); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+  .card.opened { opacity: .62; }
+  .seen-eye { font-size: 15px; color: var(--muted); cursor: help; }
+  .chip.new { background: var(--accent); color: #fff; border-color: transparent; font-weight: 700; }
+  .card h3 { margin: 0; font-size: 16px; line-height: 1.3; }
+  .card h3 a { color: var(--ink); text-decoration: none; }
+  .card h3 a:hover { color: var(--accent); text-decoration: underline; }
+  .company { font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .chip.src-wttj { background: var(--wttj); color: var(--wttj-ink); border-color: transparent; font-weight: 600; }
+  .chip.src-wn { background: var(--wn); color: var(--wn-ink); border-color: transparent; font-weight: 600; }
+  .chip.money { color: var(--accent); border-color: var(--accent); }
+  .desc { grid-column: 1 / -1; color: var(--muted); font-size: 13px; margin: 6px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .when { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .icon { border: 0; background: none; padding: 2px 4px; font-size: 18px; line-height: 1; color: var(--muted); }
+  .icon.on { color: var(--star); }
+  .more { display: block; margin: 16px auto; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  #filtersToggle { display: none; }
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+    aside { position: static; max-height: none; display: none; }
+    aside.open { display: block; }
+    #filtersToggle { display: inline-block; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="brand">Job Finder</span>
+    <input id="q" type="search" placeholder="Keywords: job title, skill, company…" autocomplete="off">
+    <label class="row" style="margin:0;white-space:nowrap"><input type="checkbox" id="title_only" checked> Titles only</label>
+    <select id="sort" style="width:auto">
+      <option value="newest">Newest first</option>
+      <option value="relevance">Most relevant</option>
+    </select>
+    <span class="tabs"><button id="tabAll" class="on">Results</button> <button id="tabSaved">Saved (<span id="savedCount">0</span>)</button></span>
+    <button id="filtersToggle">Filters</button>
+  </div>
+</header>
+
+<main>
+  <aside id="filters">
+    <fieldset>
+      <legend>Sources</legend>
+      <label class="row"><input type="checkbox" name="sources" value="wttj" checked><span class="src-dot" style="background:var(--wttj)"></span> Welcome to the Jungle <span class="hint" data-total="wttj"></span></label>
+      <label class="row"><input type="checkbox" name="sources" value="wn" checked><span class="src-dot" style="background:#6f93e6"></span> Working Nomads (remote) <span class="hint" data-total="wn"></span></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Location</legend>
+      <div class="sub">Country (Welcome to the Jungle)</div>
+      <select id="country"><option value="">Any country</option></select>
+      <div class="sub">City</div>
+      <select id="city" disabled><option value="">Any city</option></select>
+      <div class="sub">Remote job open to (Working Nomads)</div>
+      <select id="wn_location"><option value="@country">Same country as above</option><option value="">Any location</option></select>
+      <label class="row"><input type="checkbox" id="include_worldwide" checked> Include "work from anywhere" jobs</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Experience</legend>
+      <div class="sub">My experience</div>
+      <select id="max_exp">
+        <option value="">Any</option>
+        <option value="0">No experience / student</option>
+        <option value="1">Up to 1 year</option>
+        <option value="2">Up to 2 years</option>
+        <option value="3">Up to 3 years</option>
+        <option value="4">Up to 4 years</option>
+        <option value="5">Up to 5 years</option>
+        <option value="7">Up to 7 years</option>
+        <option value="10">Up to 10 years</option>
+      </select>
+      <label class="row"><input type="checkbox" id="include_unspecified_exp" checked> Include jobs that don't state it</label>
+      <div class="hint">Working Nomads only gives levels: Entry ≈ 0, Mid ≈ 2+, Senior ≈ 5+ years.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Job category</legend>
+      <div class="sub">Welcome to the Jungle</div>
+      <select id="category"><option value="">Any category</option></select>
+      <div class="sub">Working Nomads</div>
+      <select id="wn_category"><option value="">Any category</option></select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Contract</legend>
+      <div id="contracts"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Work mode</legend>
+      <label class="row"><input type="checkbox" name="remote" value="fulltime"> Fully remote</label>
+      <label class="row"><input type="checkbox" name="remote" value="partial"> Hybrid</label>
+      <label class="row"><input type="checkbox" name="remote" value="punctual"> Occasional remote</label>
+      <label class="row"><input type="checkbox" name="remote" value="no"> On-site</label>
+      <div class="hint">Picking anything other than "Fully remote" hides Working Nomads, which only lists remote jobs.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>More</legend>
+      <div class="sub">Posted within</div>
+      <select id="posted_days">
+        <option value="">Any time</option>
+        <option value="1">Last 24 hours</option>
+        <option value="3">Last 3 days</option>
+        <option value="7">Last week</option>
+        <option value="14">Last 2 weeks</option>
+        <option value="30">Last month</option>
+      </select>
+      <div class="sub">Posting language (Welcome to the Jungle)</div>
+      <select id="language"><option value="">Any language</option></select>
+      <label class="row" style="margin-top:10px"><input type="checkbox" id="hideSeenResults"> Hide seen jobs (👁)</label>
+      <label class="row"><input type="checkbox" id="hideSeen"> Hide jobs I've already opened</label>
+      <button id="reset" style="margin-top:10px;width:100%">Reset filters</button>
+      <button id="clearSeen" style="margin-top:6px;width:100%">Clear seen history</button>
+    </fieldset>
+  </aside>
+
+  <section>
+    <div id="errors"></div>
+    <div class="summary"><span id="summary">Loading…</span></div>
+    <div id="results"></div>
+    <button id="more" class="more primary" hidden>Load more</button>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const CONTRACTS = { full_time: "Full-time", part_time: "Part-time", freelance: "Freelance", internship: "Internship",
+  apprenticeship: "Apprenticeship / work-study", temporary: "Temporary / fixed-term", vie: "VIE", graduate_program: "Graduate program", other: "Other" };
+const REMOTE = { fulltime: "Fully remote", partial: "Hybrid", punctual: "Occasional remote", no: "On-site" };
+const SOURCES = { wttj: "WTTJ", wn: "Working Nomads" };
+const regionName = (() => { try { const d = new Intl.DisplayNames(["en"], { type: "region" }); return (c) => d.of(c) || c; } catch { return (c) => c; } })();
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let saved = store.get("jf.saved", {});
+let opened = new Set(store.get("jf.seen", []));
+let state = { page: 0, items: [], totals: {}, pages: {}, newCounts: {}, view: "all" };
+let reqId = 0;
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const key = (j) => j.source + ":" + j.id;
+function ago(iso) {
+  if (!iso) return "";
+  const d = (Date.now() - new Date(iso)) / 864e5;
+  if (d < 1) return "today"; if (d < 2) return "yesterday"; if (d < 30) return Math.floor(d) + " days ago";
+  if (d < 365) return Math.floor(d / 30) + " mo ago"; return Math.floor(d / 365) + " yr ago";
+}
+function expLabel(j) {
+  if (j.experience_label) return j.experience_label + " level";
+  if (j.experience == null) return "";
+  return j.experience === 0 ? "No experience required" : `${j.experience}+ yrs`;
+}
+
+function params() {
+  const p = new URLSearchParams();
+  p.set("q", $("#q").value.trim());
+  p.set("sort", $("#sort").value);
+  p.set("title_only", $("#title_only").checked ? "1" : "0");
+  p.set("only_new", $("#hideSeenResults").checked ? "1" : "0");
+  p.set("sources", $$("[name=sources]:checked").map((x) => x.value).join(","));
+  for (const id of ["country", "city", "max_exp", "category", "wn_category", "posted_days", "language"]) if ($("#" + id).value) p.set(id, $("#" + id).value);
+  if ($("#country").value) p.set("country_name", regionName($("#country").value));
+  p.set("wn_location", $("#wn_location").value);
+  p.set("include_worldwide", $("#include_worldwide").checked ? "1" : "0");
+  p.set("include_unspecified_exp", $("#include_unspecified_exp").checked ? "1" : "0");
+  const c = $$("[name=contracts]:checked").map((x) => x.value); if (c.length) p.set("contracts", c.join(","));
+  const r = $$("[name=remote]:checked").map((x) => x.value); if (r.length) p.set("remote", r.join(","));
+  return p;
+}
+
+function saveFilters() {
+  const f = {};
+  for (const el of $$("aside select, aside input, #q, #sort, #title_only")) {
+    if (!el.id && !el.name) continue;
+    const k = el.id || el.name + ":" + el.value;
+    f[k] = el.type === "checkbox" ? el.checked : el.value;
+  }
+  store.set("jf.filters", f);
+}
+function loadFilters() {
+  const f = store.get("jf.filters", null); if (!f) return;
+  for (const el of $$("aside select, aside input, #q, #sort, #title_only")) {
+    const k = el.id || el.name + ":" + el.value;
+    if (!(k in f)) continue;
+    if (el.type === "checkbox") el.checked = f[k]; else el.value = f[k];
+  }
+}
+
+async function loadMeta() {
+  const m = await fetch("/api/meta").then((r) => r.json());
+  const errs = [];
+  if (m.wttj && !m.wttj.error) {
+    $('[data-total="wttj"]').textContent = m.wttj.total.toLocaleString();
+    $("#country").insertAdjacentHTML("beforeend", m.wttj.countries
+      .map(([c, n]) => [c, regionName(c), n]).sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([c, name, n]) => `<option value="${esc(c)}">${esc(name)} (${n.toLocaleString()})</option>`).join(""));
+    $("#category").insertAdjacentHTML("beforeend", m.wttj.categories.map(([ref, label, n]) => `<option value="${esc(ref)}">${esc(label)} (${n.toLocaleString()})</option>`).join(""));
+    const langs = new Intl.DisplayNames(["en"], { type: "language" });
+    $("#language").insertAdjacentHTML("beforeend", m.wttj.languages.map(([l, n]) => `<option value="${esc(l)}">${esc(langs.of(l) || l)} (${n.toLocaleString()})</option>`).join(""));
+  } else errs.push("Welcome to the Jungle: " + (m.wttj?.error || "unavailable"));
+  if (m.wn && !m.wn.error) {
+    $('[data-total="wn"]').textContent = m.wn.total.toLocaleString();
+    $("#wn_location").insertAdjacentHTML("beforeend", m.wn.locations.filter(([l]) => l !== "Anywhere")
+      .sort((a, b) => a[0].localeCompare(b[0])).map(([l, n]) => `<option value="${esc(l)}">${esc(l)} (${n})</option>`).join(""));
+    $("#wn_category").insertAdjacentHTML("beforeend", m.wn.categories.map(([c, n]) => `<option value="${esc(c)}">${esc(c)} (${n})</option>`).join(""));
+  } else errs.push("Working Nomads: " + (m.wn?.error || "unavailable"));
+  $("#contracts").innerHTML = Object.entries(CONTRACTS).map(([v, l]) => `<label class="row"><input type="checkbox" name="contracts" value="${v}"> ${l}</label>`).join("");
+  showErrors(errs);
+}
+
+async function loadCities(keep) {
+  const c = $("#country").value, sel = $("#city");
+  sel.innerHTML = '<option value="">Any city</option>';
+  sel.disabled = !c;
+  if (!c) return;
+  const list = await fetch("/api/cities?country=" + encodeURIComponent(c)).then((r) => r.json());
+  if (Array.isArray(list)) sel.insertAdjacentHTML("beforeend", list.map(([n, k]) => `<option value="${esc(n)}">${esc(n)} (${k})</option>`).join(""));
+  if (keep) sel.value = keep;
+}
+
+function showErrors(list) { $("#errors").innerHTML = list.map((e) => `<div class="err">${esc(e)}</div>`).join(""); }
+
+async function search(reset = true) {
+  if (state.view === "saved") return renderSaved();
+  const id = ++reqId;
+  if (reset) { state.page = 0; state.items = []; state.autoLoads = 0; $("#summary").textContent = "Searching…"; }
+  const p = params(); p.set("page", state.page);
+  saveFilters();
+  let data;
+  try { data = await fetch("/api/search?" + p).then((r) => r.json()); }
+  catch (e) { showErrors(["Can't reach the local server. Is server.py still running?"]); return; }
+  if (id !== reqId) return;
+  const errs = [], lists = [];
+  if (reset) { state.totals = {}; state.newCounts = {}; }
+  for (const [src, r] of Object.entries(data)) {
+    if (r.error) { errs.push(`${SOURCES[src]}: ${r.error}`); continue; }
+    state.totals[src] = r.total; state.pages[src] = r.pages;
+    if (r.new != null) state.newCounts[src] = r.new;
+    lists.push(r.hits);
+  }
+  let fresh = [];
+  if ($("#sort").value === "newest") fresh = lists.flat().sort((a, b) => (b.published || "").localeCompare(a.published || ""));
+  else for (let i = 0; i < Math.max(0, ...lists.map((l) => l.length)); i++) for (const l of lists) if (l[i]) fresh.push(l[i]);
+  state.items.push(...fresh);
+  showErrors(errs);
+  render();
+}
+
+function render() {
+  const total = Object.values(state.totals).reduce((a, b) => a + b, 0);
+  const parts = Object.entries(state.totals).map(([s, n]) => `${SOURCES[s]}: ${n.toLocaleString()}`).join(" · ");
+  const fresh = Object.values(state.newCounts).reduce((a, b) => a + b, 0);
+  $("#summary").innerHTML = `<span><b>${total.toLocaleString()}</b> jobs found ${parts ? "(" + parts + ")" : ""}</span>
+    <span><span class="chip new">${fresh.toLocaleString()} new</span> <span class="hint">👁 = older than the newest job from your last visit</span></span>`;
+  const hide = $("#hideSeen").checked;
+  const items = state.items.filter((j) => !hide || !opened.has(key(j)));
+  $("#results").innerHTML = items.length ? items.map(card).join("") : `<div class="empty">No jobs match these filters. Try fewer filters or other keywords.</div>`;
+  const more = Object.keys(state.totals).some((s) => state.page + 1 < (state.pages[s] || 0));
+  $("#more").hidden = !more;
+  if (more && hide && items.length < 15 && state.autoLoads < 5) { state.autoLoads++; state.page++; search(false); }
+}
+
+function renderSaved() {
+  const items = Object.values(saved).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+  $("#summary").innerHTML = `<span><b>${items.length}</b> saved jobs (stored in this browser)</span>`;
+  $("#results").innerHTML = items.length ? items.map(card).join("") : `<div class="empty">Star a job to keep it here.</div>`;
+  $("#more").hidden = true;
+}
+
+function card(j) {
+  const k = key(j);
+  const chips = [
+    `<span class="chip src-${j.source}">${SOURCES[j.source]}</span>`,
+    j.location && `<span class="chip">📍 ${esc(j.location)}</span>`,
+    j.contract && `<span class="chip">${esc(CONTRACTS[j.contract] || j.contract)}</span>`,
+    j.remote && REMOTE[j.remote] && `<span class="chip">${REMOTE[j.remote]}</span>`,
+    expLabel(j) && `<span class="chip">${esc(expLabel(j))}</span>`,
+    j.category && `<span class="chip">${esc(j.category)}</span>`,
+    j.salary && `<span class="chip money">${esc(j.salary)}</span>`,
+  ].filter(Boolean).join("");
+  return `<article class="card ${opened.has(k) ? "opened" : ""}" data-key="${esc(k)}">
+    <div>
+      <h3><a href="${esc(j.url)}" target="_blank" rel="noopener" data-open>${esc(j.title)}</a></h3>
+      <div><span class="company">${esc(j.company)}</span>${j.role ? ` · <span class="hint">${esc(j.role)}</span>` : ""}</div>
+      <div class="meta">${chips}</div>
+    </div>
+    <div class="side">
+      <span class="when" title="${esc(j.published || "")}">${ago(j.published)}</span>
+      ${j.seen ? `<span class="seen-eye" title="Seen: published before the newest job you'd received by your last visit">👁</span>` : state.view === "all" ? `<span class="chip new">New</span>` : ""}
+      <button class="icon ${saved[k] ? "on" : ""}" data-star title="Save">${saved[k] ? "★" : "☆"}</button>
+    </div>
+    ${j.summary ? `<p class="desc">${esc(j.summary)}</p>` : ""}
+  </article>`;
+}
+
+function itemFor(k) { return state.items.find((j) => key(j) === k) || saved[k]; }
+
+$("#results").addEventListener("click", (e) => {
+  const cardEl = e.target.closest(".card"); if (!cardEl) return;
+  const k = cardEl.dataset.key;
+  if (e.target.closest("[data-star]")) {
+    if (saved[k]) delete saved[k]; else saved[k] = { ...itemFor(k), savedAt: Date.now() };
+    store.set("jf.saved", saved); $("#savedCount").textContent = Object.keys(saved).length;
+    state.view === "saved" ? renderSaved() : render();
+  } else if (e.target.closest("[data-open]")) {
+    opened.add(k); store.set("jf.seen", [...opened].slice(-5000)); cardEl.classList.add("opened");
+  }
+});
+
+let t;
+const debounced = () => { clearTimeout(t); t = setTimeout(() => search(true), 350); };
+$("#q").addEventListener("input", debounced);
+$("#sort").addEventListener("change", () => search(true));
+$("#title_only").addEventListener("change", () => search(true));
+$("#filters").addEventListener("change", (e) => {
+  if (e.target.id === "hideSeen") { saveFilters(); return state.view === "saved" ? renderSaved() : render(); }
+  if (e.target.id === "country") loadCities();
+  search(true);
+});
+$("#clearSeen").addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Click again to confirm"; setTimeout(() => { delete b.dataset.armed; b.textContent = "Clear seen history"; }, 4000); return; }
+  await fetch("/api/seen/clear", { method: "POST" });
+  delete b.dataset.armed; b.textContent = "Clear seen history"; search(true);
+});
+$("#more").addEventListener("click", () => { state.page++; search(false); });
+$("#reset").addEventListener("click", () => { store.set("jf.filters", null); location.reload(); });
+$("#filtersToggle").addEventListener("click", () => $("#filters").classList.toggle("open"));
+$("#tabAll").addEventListener("click", () => { state.view = "all"; $("#tabAll").classList.add("on"); $("#tabSaved").classList.remove("on"); search(true); });
+$("#tabSaved").addEventListener("click", () => { state.view = "saved"; $("#tabSaved").classList.add("on"); $("#tabAll").classList.remove("on"); renderSaved(); });
+
+(async () => {
+  $("#savedCount").textContent = Object.keys(saved).length;
+  await loadMeta();
+  const city = store.get("jf.filters", {})?.city;
+  loadFilters();
+  if ($("#country").value) await loadCities(city);
+  search(true);
+})();
+</script>
+</body>
+</html>
