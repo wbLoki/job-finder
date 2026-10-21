@@ -48,7 +48,7 @@ Both are unofficial: if either site changes its internals, that source will show
 
 A command-line scan for remote TypeScript / React / Node roles that someone outside the US/EU can apply to. It checks:
 
-- the public job boards (Greenhouse, Lever, Ashby) of about 170 remote-friendly companies;
+- the public job boards (Greenhouse, Lever, Ashby) of about 110 remote-friendly companies;
 - the Remotive, Remote OK, We Work Remotely and Himalayas feeds.
 
 ```
@@ -63,3 +63,5 @@ Double-clicking `scan.bat` does the same. Everything it keeps is in `data/` (git
 - `data/scan_latest.csv`: every match from the last run, to open in a spreadsheet.
 
 To add companies, put their board name into `GREENHOUSE`, `LEVER` or `ASHBY` at the top of the file (the part after `boards.greenhouse.io/`, `jobs.lever.co/` or `jobs.ashbyhq.com/`). The title, stack and location filters are the regexes below those lists.
+
+It's tuned for a frontend-leaning developer with about 2 years of experience: backend-only titles are skipped, postings whose description asks for more than `MAX_YEARS` (3) years are dropped, and senior-sounding titles are kept but marked `senior`, since some of them only ask for 2 years.

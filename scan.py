@@ -14,35 +14,33 @@ sys.stdout.reconfigure(encoding="utf-8")
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) job-finder/1.0"}
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-GREENHOUSE = ["gitlab", "remotecom", "hotjar", "docker", "sourcegraph", "mozilla", "wikimedia", "vercel", "automatticcareers",
-              "canonical", "consensys", "kraken", "cloudflare", "elastic", "grafanalabs", "mongodb", "datadog", "toggl",
-              "doist", "duckduckgo", "proton", "chainlinklabs", "okx", "binance", "bitpanda", "airtable", "figma",
-              "hubspot", "zapier", "twilio", "contentful", "typeform", "jetbrains", "clickhouse", "netlify", "sentry",
-              "planetscale", "appwrite", "storyblok", "strapi", "deliveroo", "glovo", "revolut", "wise", "n26", "monzo",
-              "taxfix", "personio", "celonis", "miro", "pleo", "mollie", "adyen", "bolt", "workable", "toptal",
-              "turing", "andela", "x-team", "10up", "humanmade", "wpengine", "kinsta", "yoast", "invisionapp", "buffer",
-              "ghost", "helpscout", "close", "loom", "webflow", "oyster", "deel", "omnipresent", "lemlist",
-              "brevo", "doctolib", "alan", "qonto", "swile", "backmarket", "ledger", "sorare", "payfit", "spendesk",
-              "malt", "mirakl", "contentsquare", "dataiku", "algolia", "pennylane", "aircall", "agicap", "yousign"]
-LEVER = ["Yassir", "proxify", "toptal", "binance", "kraken", "metabase", "jobgether", "weloglobal", "hostinger", "plaid",
-         "zoox", "mistral", "dailymotion", "ledger", "swile", "brevo", "qonto", "voodoo", "deezer", "blablacar",
-         "contentsquare", "alan", "spendesk", "ankorstore", "pigment", "sorare", "doctolib", "ornikar", "luko", "shift-technology"]
-ASHBY = ["supabase", "posthog", "deel", "cal.com", "n8n", "linear", "replit", "raycast", "resend", "clerk", "neon",
-         "railway", "render", "sanity", "payload", "trigger.dev", "inngest", "zed", "warp", "mistral", "huggingface",
-         "elevenlabs", "synthesia", "photoroom", "dust", "pennylane", "alan", "qonto", "tiime", "lovable", "bolt.new",
-         "remote", "oyster", "multiverse", "polar", "dub", "documenso", "formbricks", "twenty", "infisical",
-         "stickermule", "toggl"]
+GREENHOUSE = ["gitlab", "mozilla", "wikimedia", "vercel", "automatticcareers", "canonical", "consensys", "cloudflare",
+              "elastic", "grafanalabs", "mongodb", "datadog", "proton", "okx", "binance", "bitpanda", "airtable", "figma",
+              "hubspotjobs", "twilio", "contentful", "typeform", "jetbrains", "netlify", "planetscale", "storyblok",
+              "deliveroo", "wise", "n26", "monzo", "celonis", "adyen", "turing", "ghost", "webflow", "doctolib", "mirakl",
+              "dataiku", "algolia", "shifttechnology"]
+LEVER = ["Yassir", "toptal", "binance", "kraken", "metabase", "jobgether", "weloglobal", "zoox", "mistral", "swile",
+         "brevo", "qonto", "blablacar", "contentsquare", "pigment", "agicap", "aircall", "kinsta", "malt"]
+ASHBY = ["supabase", "posthog", "deel", "n8n", "linear", "replit", "raycast", "resend", "clerk", "neon", "railway",
+         "render", "sanity", "triggerdev", "inngest", "zed", "warp", "elevenlabs", "synthesia", "photoroom", "dust",
+         "pennylane", "alan", "qonto", "lovable", "oyster", "multiverse", "polar", "twenty", "infisical", "stickermule",
+         "andela", "ankorstore", "backmarket", "buffer", "clickhouse", "close", "docker", "doctolib", "helpscout",
+         "hostinger", "ledger", "lemlist", "miro", "mollie", "plaid", "pleo", "sentry", "sorare", "voodoo", "zapier"]
 
-TITLE_OK = re.compile(r"(front[ -]?end|full[ -]?stack|back[ -]?end|software engineer|software developer|web developer|"
+# ~2 years, mostly frontend: skip backend-only roles and postings that ask for more than MAX_YEARS.
+# "Senior" is only flagged, since some senior-titled posts ask for 2 years.
+MAX_YEARS = 3
+SENIOR = re.compile(r"\b(senior|sr\.?|experienced)\b", re.I)
+TITLE_OK = re.compile(r"(front[ -]?end|full[ -]?stack|software engineer|software developer|web developer|"
                       r"mobile|react|typescript|node|javascript|product engineer|ai engineer|application engineer)", re.I)
-TITLE_BAD = re.compile(r"(staff|principal|director|manager|head of|\bvp\b|lead|intern|android|ios\b|swift|kotlin|"
-                       r"\.net|c#|java\b|golang|\bgo\b|rust|scala|ruby|php|elixir|data engineer|ml |machine learning|"
+TITLE_BAD = re.compile(r"(back[ -]?end|staff|principal|director|manager|head of|\bvp\b|lead|intern|android|ios\b|swift|kotlin|"
+                       r"\.net|c#|c\+\+|java\b|golang|\bgo\b|rust|scala|ruby|php|elixir|data engineer|ml |machine learning|"
                        r"security|sre|site reliability|devops|qa|test|embedded|firmware|support|sales|solutions|"
                        r"salesforce|wordpress|shopify|unity|blockchain|solidity|web3|developer relations|documentation|"
                        r"platform|database|reliability|performance|release|finops|grc|operations|business|sdk|"
                        r"forward deployed|sage|angular|python)", re.I)
 STACK = re.compile(r"\b(typescript|react|next\.?js|node\.?js|react native|expo)\b", re.I)
-LOC_OK = re.compile(r"(anywhere(?! in (?!the world))|worldwide|global|emea|africa|morocco|mena|europe, middle east|^remote$)", re.I)
+LOC_OK = re.compile(r"(anywhere(?! in (?!the world))|worldwide|global|emea|(?<!south )africa|morocco|mena|europe, middle east|^remote$)", re.I)
 LOC_BAD = re.compile(r"\b(usa?|united states|us only|canada|north america|latam|latin america|americas|uk only|india|"
                      r"philippines|brazil|australia|apac|asia)\b", re.I)
 
@@ -120,7 +118,7 @@ def remoteok():
 
 def wwr():
     out = []
-    for cat in ["remote-full-stack-programming-jobs", "remote-front-end-programming-jobs", "remote-back-end-programming-jobs"]:
+    for cat in ["remote-full-stack-programming-jobs", "remote-front-end-programming-jobs"]:
         xml = fetch(f"https://weworkremotely.com/categories/{cat}.rss")
         try:
             items = list(ET.fromstring(xml).iter("item")) if xml else []
@@ -148,7 +146,12 @@ def himalayas():
 
 
 def location_ok(loc):
-    if any(LOC_OK.search(part.strip()) for part in re.split(r"[/;|]", loc)):
+    parts = [p.strip() for p in re.split(r"[/;|]", loc) if p.strip()]
+    ok = [p for p in parts if LOC_OK.search(p)]
+    # A bare "Remote" next to named countries (Ashby's "Germany / Remote") means remote within those countries
+    if ok and all(p.lower() == "remote" for p in ok) and len(ok) < len(parts):
+        return False
+    if ok:
         return not LOC_BAD.search(loc) or re.search(r"worldwide|anywhere|global", loc, re.I)
     return False
 
@@ -182,10 +185,13 @@ def main():
         key = (j[1].lower().strip(), j[2].lower().strip())
         if key in keys or any(a in j[1].lower() for a in applied) or not matches(j):
             continue
-        keys.add(key)
         yrs = re.findall(r"(\d+)\+?\s*(?:-\s*\d+\s*)?years?", j[6])
+        min_years = min(map(int, yrs)) if yrs else ""
+        if min_years != "" and min_years > MAX_YEARS:
+            continue
+        keys.add(key)
         hits.append({"date": j[5], "source": j[0], "company": j[1], "title": j[2], "location": j[3],
-                     "min_years": min(map(int, yrs)) if yrs else "", "url": j[4]})
+                     "min_years": min_years, "senior": "senior" if SENIOR.search(j[2]) else "", "url": j[4]})
 
     os.makedirs(DATA, exist_ok=True)
     seen_path = os.path.join(DATA, "scan_seen.json")
@@ -207,7 +213,7 @@ def main():
 
     print(f"scanned {len(jobs)} postings, {len(hits)} matches, {len(new)} new")
     for h in sorted(hits if show_all else new, key=lambda h: h["date"], reverse=True):
-        print(" | ".join(str(h[k]) for k in ("date", "source", "company", "title", "location", "min_years", "url")))
+        print(" | ".join(str(h[k]) for k in ("date", "source", "company", "title", "location", "min_years", "senior", "url")))
 
 
 if __name__ == "__main__":
