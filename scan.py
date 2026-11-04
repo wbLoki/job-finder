@@ -14,18 +14,26 @@ sys.stdout.reconfigure(encoding="utf-8")
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) job-finder/1.0"}
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-GREENHOUSE = ["gitlab", "mozilla", "wikimedia", "vercel", "automatticcareers", "canonical", "consensys", "cloudflare",
-              "elastic", "grafanalabs", "mongodb", "datadog", "proton", "okx", "binance", "bitpanda", "airtable", "figma",
-              "hubspotjobs", "twilio", "contentful", "typeform", "jetbrains", "netlify", "planetscale", "storyblok",
-              "deliveroo", "wise", "n26", "monzo", "celonis", "adyen", "turing", "ghost", "webflow", "doctolib", "mirakl",
-              "dataiku", "algolia", "shifttechnology"]
+GREENHOUSE = ["gitlab", "mozilla", "wikimedia", "vercel", "automatticcareers", "canonical", "consensys", "cloudflare", "elastic",
+              "grafanalabs", "mongodb", "datadog", "proton", "okx", "binance", "bitpanda", "airtable", "figma",
+              "hubspotjobs", "twilio", "contentful", "typeform", "jetbrains", "netlify", "planetscale",
+              "storyblok", "deliveroo", "wise", "n26", "monzo", "celonis", "adyen", "turing", "ghost", "webflow",
+              "doctolib", "mirakl", "dataiku", "algolia", "shifttechnology", "doitintl", "offerzen", "tailscale",
+              "feedzai", "invisibletech", "mattermost", "rocketchat", "brave", "bitwarden", "speechmatics",
+              "intercom", "sendbird", "knock", "customerio", "mixpanel", "pagerduty", "honeycomb", "axiom",
+              "coinbase", "ripple", "blockchain", "bybit", "gemini", "ramp", "fireblocks"]
 LEVER = ["Yassir", "toptal", "binance", "kraken", "metabase", "jobgether", "weloglobal", "zoox", "mistral", "swile",
-         "brevo", "qonto", "blablacar", "contentsquare", "pigment", "agicap", "aircall", "kinsta", "malt"]
+         "brevo", "qonto", "blablacar", "contentsquare", "pigment", "agicap", "aircall", "kinsta", "malt",
+         "jobandtalent", "100ms", "logrocket", "tinybird", "safe", "crypto", "moonpay"]
 ASHBY = ["supabase", "posthog", "deel", "n8n", "linear", "replit", "raycast", "resend", "clerk", "neon", "railway",
-         "render", "sanity", "triggerdev", "inngest", "zed", "warp", "elevenlabs", "synthesia", "photoroom", "dust",
-         "pennylane", "alan", "qonto", "lovable", "oyster", "multiverse", "polar", "twenty", "infisical", "stickermule",
-         "andela", "ankorstore", "backmarket", "buffer", "clickhouse", "close", "docker", "doctolib", "helpscout",
-         "hostinger", "ledger", "lemlist", "miro", "mollie", "plaid", "pleo", "sentry", "sorare", "voodoo", "zapier"]
+         "render", "sanity", "triggerdev", "inngest", "zed", "warp", "elevenlabs", "synthesia", "photoroom",
+         "dust", "pennylane", "alan", "qonto", "lovable", "oyster", "multiverse", "polar", "twenty", "infisical",
+         "stickermule", "andela", "ankorstore", "backmarket", "buffer", "clickhouse", "close", "docker",
+         "doctolib", "helpscout", "hostinger", "ledger", "lemlist", "miro", "mollie", "plaid", "pleo", "sentry",
+         "sorare", "voodoo", "zapier", "wundergraph", "ashby", "gitbook", "tldraw", "mintlify", "alchemy",
+         "paddle", "coder", "chromatic", "1password", "airbyte", "prefect", "cube", "hex", "deepnote", "cohere",
+         "writer", "deepl", "livekit", "knock", "amplitude", "fullstory", "checkly", "consensys", "nethermind",
+         "safe", "phantom", "satoshilabs", "ramp", "circle", "dune"]
 
 # ~2 years, mostly frontend: skip backend-only roles and postings that ask for more than MAX_YEARS.
 # "Senior" is only flagged, since some senior-titled posts ask for 2 years.

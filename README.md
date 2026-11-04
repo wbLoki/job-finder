@@ -48,7 +48,7 @@ Both are unofficial: if either site changes its internals, that source will show
 
 A command-line scan for remote TypeScript / React / Node roles that someone outside the US/EU can apply to. It checks:
 
-- the public job boards (Greenhouse, Lever, Ashby) of about 110 remote-friendly companies;
+- the public job boards (Greenhouse, Lever, Ashby) of about 170 remote-friendly companies;
 - the Remotive, Remote OK, We Work Remotely and Himalayas feeds.
 
 ```
