@@ -65,3 +65,17 @@ Double-clicking `scan.bat` does the same. Everything it keeps is in `data/` (git
 To add companies, put their board name into `GREENHOUSE`, `LEVER` or `ASHBY` at the top of the file (the part after `boards.greenhouse.io/`, `jobs.lever.co/` or `jobs.ashbyhq.com/`). The title, stack and location filters are the regexes below those lists.
 
 It's tuned for a frontend-leaning developer with about 2 years of experience: backend-only titles are skipped, postings whose description asks for more than `MAX_YEARS` (3) years are dropped, and senior-sounding titles are kept but marked `senior`, since some of them only ask for 2 years.
+
+## Startup outreach (`outreach.py`)
+
+Finds startups that announced a seed or pre-seed round in the last week. These are usually hiring, and the founders still hire themselves. It reads Google News and a few startup news feeds, skips science and hardware companies, guesses each company's website and lists what it finds there: the stack (Next.js, React, mobile apps), open roles on Greenhouse / Lever / Ashby / Workable, the careers page, founder names and emails published on the site.
+
+```
+python outreach.py                   # new rounds from the last 7 days
+python outreach.py --days 14         # look further back
+python outreach.py --all             # include companies shown before
+python outreach.py lookup acme.com   # the same lookup for one company, e.g. from a LinkedIn post
+python outreach.py linkedin          # links to LinkedIn posts from the last 24h, to open in your browser
+```
+
+The website is guessed from the name (`acme.com`, `acme.ai`, `getacme.com`...), so a common name can point to the wrong company: check the site before writing. It doesn't send anything. Results go to `data/outreach_latest.csv` (with links to the news articles), and shown companies are remembered in `data/outreach_seen.json`.
