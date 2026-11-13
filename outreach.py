@@ -210,7 +210,7 @@ def eng_titles(jobs):
 
 # ---------- 3. LinkedIn links ----------
 
-LINKEDIN_QUERIES = ["recrute développeur react", "recrute développeur react native", "on recrute développeur front",
+LINKEDIN_QUERIES = ["recrute react", "recrute react native", "recrute frontend", "react maroc recrutement",
                     "we are hiring react developer remote", "hiring react native developer", "hiring frontend engineer remote",
                     "founding engineer react hiring"]
 
